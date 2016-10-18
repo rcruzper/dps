@@ -1,0 +1,24 @@
+#!/bin/sh
+
+dockerPs=$(docker ps -a | fzf-tmux --exit-0 --tac --expect=ctrl-i,ctrl-s,ctrl-x,ctrl-l,ctrl-e)
+key=$(head -1 <<< "$dockerPs")
+containerId=$(head -2 <<< "$dockerPs" | tail -1 | awk '{print $1;}')
+containerName=$(docker inspect --format='{{.Name}}' $containerId)
+
+    if [[ "$key" == 'ctrl-i' ]]; then
+        docker inspect $containerId
+    elif [[ "$key" == 'ctrl-s' ]]; then
+        echo "Stopping $containerName"
+        docker stop $containerId
+    elif [[ "$key" == 'ctrl-x' ]]; then
+        echo "Starting $containerName"
+        docker start $containerId
+    elif [[ "$key" == 'ctrl-l' ]]; then
+        docker logs -f $containerId
+    elif [[ "$key" == 'ctrl-e' ]]; then
+        docker exec -i -t $containerId /bin/bash
+    else
+        echo $containerId | tr -d '\n' | pbcopy
+        echo $containerId
+    fi
+
