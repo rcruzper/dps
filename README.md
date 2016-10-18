@@ -17,6 +17,10 @@ $ brew install dps
 
 ## Usage
 
+dps accepts all docker ps [params](https://docs.docker.com/engine/reference/commandline/ps/) (i.e. dps -a -n 5 will show the last 5 containers with any status)
+
+dps allows to execute those actions on each container:
+
 - ```CTRL-i``` inspects the container
 - ```CTRL-s``` stops the container
 - ```CTRL-x``` starts the container
