@@ -2,6 +2,8 @@
 
 Command-line tool to execute most common actions with a docker container via docker ps and [fzf](https://github.com/junegunn/fzf)
 
+![ttygif](https://raw.githubusercontent.com/rcruzper/dps/master/tty.gif)
+
 ## Requirements
 
 - [brew](http://brew.sh/index_es.html)
