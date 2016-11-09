@@ -9,8 +9,12 @@ if git diff-tree --no-commit-id --name-only -r HEAD; then
     REPO=`git config remote.origin.url`
     SSH_REPO=${REPO/https:\/\/github.com\//git@github.com:}
 
+    # Set config
+    git config --global user.email "rcruzper@gmail.com"
+    git config --global user.name "Travis CI"
+
     # Create git tag
-    GIT_TAG=`git describe --abbrev=0 --tags | awk -F'[.]' '/^v/ {print $1"."$2"."$3+1}'`
+    export GIT_TAG=`git describe --abbrev=0 --tags | awk -F'[.]' '/^v/ {print $1"."$2"."$3+1}'`
     git tag $GIT_TAG -a -m "Generated tag from TravisCI build $TRAVIS_BUILD_NUMBER"
 
     # Get the deploy key by using Travis's stored variables to decrypt deploy_key.enc
@@ -27,4 +31,5 @@ if git diff-tree --no-commit-id --name-only -r HEAD; then
     git push $SSH_REPO --tags
 else
     echo 'dps code does not changed'
+    exit 1
 fi

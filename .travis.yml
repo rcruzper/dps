@@ -1,5 +1,5 @@
 language: generic
-script: bash ./deploy.sh
+script: ./deploy.sh
 env:
   global:
     ENCRYPTION_LABEL: 44cecb45b4cf
@@ -13,4 +13,4 @@ deploy:
   file: dps
   skip_cleanup: true
   on:
-    tags: true
+    condition: $TRAVIS_TEST_RESULT == 0
