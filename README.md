@@ -16,6 +16,10 @@ Command-line tool to execute most common actions with a docker container via doc
 $ brew tap rcruzper/homebrew-tools
 $ brew install dps
 ```
+or
+```shell
+$ brew install rcruzper/homebrew-tools/dps
+```
 
 ## Usage
 

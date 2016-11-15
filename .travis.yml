@@ -1,16 +1,24 @@
 language: generic
-script: ./deploy.sh
-env:
-  global:
-    ENCRYPTION_LABEL: 44cecb45b4cf
 branches:
   only:
-    - master
+  - master
+before_deploy:
+  - git config --global user.email "rcruzper@gmail.com"
+  - git config --global user.name "Travis CI"
+  - GIT_TAG=`git describe --abbrev=0 --tags | awk -F'[.]' '/^v/ {print $1"."$2"."$3+1}'`
+  - OLD_VERSION=`git describe --abbrev=0 --tags | awk -F'[.]' '/^v/ {print $1"."$2"."$3}' | cut -c 2-`
+  - NEW_VERSION=`git describe --abbrev=0 --tags | awk -F'[.]' '/^v/ {print $1"."$2"."$3+1}' | cut -c 2-`
+  - SHA256=`shasum -a 256 dps | cut -c -64`
+  - git tag $GIT_TAG -a -m "Generated tag from TravisCI build $TRAVIS_BUILD_NUMBER"
 deploy:
   provider: releases
   api_key:
-    secure: DB+wygM281HfzEqOK9aXK1dTkCcJo1HW6GeJ/M9Zkm1ohoKB0tuJeJ7qFrvT+nmmhXlL3Nf9pNCgGVPc8HX8edYmFX/chn4sNLx2G4mwBX1jD/ibi1MYBA20TtGm2YyJwLFxEWXL12WoF3Dy5mQeZaWrzaFjKtwVvtm3NtpPVdKmobxZ0IsVxUhJP30rFsJKQXTBiAHCHkAl+o07GE86upVtUOFi0UC6XvGBd3nd7wwRqj4B3Uhv0jkmCSZQlUUhxwr5lAOA+7cmTsrwmxyEREse4i5XdJ79ODVCXMq+3xQvMXQiRKDK5yyQjKVWkeFVqo1gjbt9msuFTlK/sGroOUzvA3KA910005Fl2/TGOUj9lT9XR2ZqJ5zjp6FGj2MTGAxfVuyqfIbq+1tsBnNEqtHIMqUl1g+bhro0a5g79yxEsuuYCESpt4SNfAwbtv7P9Xdal6N4ctdaga8KZc2ndIFdlqA5IGw0/FzLVIlYDTz6Zeg7GT9d2hJ5JMQcdow9jJf52nZ/yqvkxWH4H+L/GNGXyRHuFvbxp/ZJTjXZXHk5v52diJfMw3p0rFvOrekWXasUgyc8CjNIyOvzvyjPWaA/TU/XKFLQbq2s94hBjmzkR09AApJD0GZyexbClyRKse5hhVI8BOvYqTuf1XLnSeBLrtq/4eK1vpWIeS+W564=
+    secure: GvzxpLk6J+UC6+WydheBmbrwLxcVLqsc54byNMVA/3fbamylJnOJuOaldm7oG83wws41RdfJ/g97kd8rGLjLIhjvRej0mskFBtwFvfOmjCQ8kvoLDfhCHAt/QB+TU/HLKgZyFQS6fzLAqQ33b8Q37g4xscHnjJVVyq2Ql4SJvQ2a5N4uJaSyFJCLzFpj1VLg69aALvTQoe4OmgCVjX+dxsF3nP2IovwSKdvqKES+1VD0vwTjtdA0gD2/aI6GPH+NQrnZVFoEu+xlr4zG/HSUDYcKQjakfhDFdOD4HLuNtPwwOrhm1h8Qc13kBrjYfnzxxXEwD4EVQiG+/1NTynq/4qaeVZKbjrUBspeGAGXsiXluaSqCtx+sWg0o5mrvEFN6chJwmzfhMpHOadS5p5GPQpDM/zmp7sX9W+4HHDGyL61U76r9UAJyf4i2L0vtDz4enJbag0NqIQfoQi2I/p/BtMT3ZykQUpsXoVUxuFV6uTxW2AvcTQ8aHqLGKUa3KblIZqYh8bPBfu59dy+6hvPUWat/gnVWLUvrgVTLeGjZHQ7G6pmYEoU5AZymi8O+XBrh9nmhYwXhZ8HdhbI6Djw7b4nQEby9wY6Isva3nxTbL7eh5SZbPYKadtVmb8FO11Qph7x+4rzA9g2HCluXKL20mG4048w6Ap3SiM4QCqCa0kA=
   file: dps
   skip_cleanup: true
   on:
-    condition: $TRAVIS_TEST_RESULT == 0
+    condition: "$TRAVIS_TEST_RESULT == 0"
+    repo: rcruzper/dps
+after_deploy:
+  - body="{\"request\":{\"version\":\"master\",\"config\":{\"env\":{\"old_version\":\"$OLD_VERSION\",\"formula\":\"dps\",\"new_version\":\"$NEW_VERSION\",\"sha256\":\"$SHA256\"}}}}"
+  - curl -s -X POST -H "Content-Type:application/json" -H "Accept:application/json" -H "Travis-API-Version:3" -H "Authorization:token $TRAVIS_API_TOKEN" -d "$body" https://api.travis-ci.org/repo/rcruzper%2Fhomebrew-tools/requests
