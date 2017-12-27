@@ -18,7 +18,7 @@ if [ -n "$containerId" ];  then
     elif [[ "$key" == 'ctrl-l' ]]; then
         docker logs -f $containerId
     elif [[ "$key" == 'ctrl-e' ]]; then
-        docker exec -i -t $containerId /bin/bash
+        docker exec -i -t $containerId /bin/sh
     else
         if [[ "$OSTYPE" == "darwin"* ]]; then
             echo $containerId | tr -d '\n' | pbcopy
